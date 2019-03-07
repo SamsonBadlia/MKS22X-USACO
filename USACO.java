@@ -17,37 +17,35 @@ public class USACO{
     Scanner s = new Scanner(f);
     String str = s.nextLine();
     intepret(str);
-    fillGrid(rows,filename);
+    fillGrid(rows,s);
     for (int i = 0; i < rows; i++){
-      int[] instructions = getarray(str);
-      dig(instructions[2], instructions[3], instructions[4]);
+      int[] instructions = getarray(s);
+      instructions[0]--;
+      instructions[1]--;
+      dig(instructions[0], instructions[1], instructions[2]);
     }
     fillLake();
     return getVolume();
 
   }
 
-  public static void fillGrid(int r,String filename) throws FileNotFoundException{
+  public static void fillGrid(int r,Scanner s){
 
-    File f = new File(filename);
-    Scanner s = new Scanner(f);
     grid = new int[rows][];
     for (int i = 0; i < rows; i++){
-      grid[i] = getarray(filename);
+      grid[i] = getarray(s);
     }
 
   }
 
-  private static int[] getarray(String filename) throws FileNotFoundException{
+  private static int[] getarray(Scanner s){
 
-    File f = new File(filename);
-    Scanner scan = new Scanner(f);
-    String s = scan.nextLine();
+    String str = s.nextLine();
 
-    String[] str = s.split(" ");
-    int[] ints = new int[str.length];
-    for(int i = 0; i < str.length; i++){
-        ints[i] = Integer.parseInt(str[i]);
+    String[] strs = str.split(" ");
+    int[] ints = new int[strs.length];
+    for(int i = 0; i < strs.length; i++){
+        ints[i] = Integer.parseInt(strs[i]);
     }
     return ints;
   }
