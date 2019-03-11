@@ -3,96 +3,80 @@ import java.io.*;
 
 public class USACO{
 
-  static int rows,cols,depth,digginginstructions;
-  static int[][] grid;
-  static int[][] moves = {
-    {0,0} , {0,-1}, {0,-2},
-    {1,0} , {1,-1}, {1,-2},
-    {2,0} , {2,-1}, {2,-2}
-  };
-
   public static int bronze(String filename) throws FileNotFoundException{
+  int[][] grid;
+  int[][] moves;
+  int depth;
+  File f = new File(filename);
+  Scanner s = new Scanner(f);
+  int row = s.nextInt();
+  int col = s.nextInt();
 
-    File f = new File(filename);
-    Scanner s = new Scanner(f);
-    String str = s.nextLine();
-    intepret(str);
-    fillGrid(rows,s);
-    for (int i = 0; i < rows; i++){
-      int[] instructions = getarray(s);
-      instructions[0]--;
-      instructions[1]--;
-      dig(instructions[0], instructions[1], instructions[2]);
+  grid = new int[row][col];
+  depth = s.nextInt();
+  int move = s.nextInt();
+  moves = new int[move][3];
+
+  fillGrid(grid,row,col,s);
+  generateMoves(moves, move, s);
+
+  int count = 0;
+  while (count < moves.length) {
+    dig(grid, moves[count]);
+    count++;
+  }
+  
+  return calculateVolume(grid, row, col, depth);
+}
+
+  public static void dig(int[][] grid, int[] moves) {
+    int largest = 0;
+    for (int i = moves[0]; i < moves[0]+3 && i < grid.length ; i++) {
+      for (int j = moves[1]; j < moves[1]+3 && j < grid[0].length; j++) {
+        if (grid[i][j] > largest) {
+          largest = grid[i][j];
+        }
+      }
     }
-    fillLake();
-    return getVolume();
-
-  }
-
-  public static void fillGrid(int r,Scanner s){
-
-    grid = new int[rows][];
-    for (int i = 0; i < rows; i++){
-      grid[i] = getarray(s);
-    }
-
-  }
-
-  private static int[] getarray(Scanner s){
-
-    String str = s.nextLine();
-
-    String[] strs = str.split(" ");
-    int[] ints = new int[strs.length];
-    for(int i = 0; i < strs.length; i++){
-        ints[i] = Integer.parseInt(strs[i]);
-    }
-    return ints;
-  }
-
-  public static void intepret(String s){
-
-    String[] str = s.split(" ");
-    rows = Integer.parseInt(str[0]);
-    cols = Integer.parseInt(str[1]);
-    depth = Integer.parseInt(str[2]);
-    digginginstructions = Integer.parseInt(str[3]);
-
-  }
-
-  public static void fillLake(){
-    for (int i = 0; i < rows; i++){
-      for (int j = 0; j < grid[0].length; j++){
-        int elevation = depth - grid[i][j];
-        if (elevation < 0 ) grid[i][j] = 0;
-        grid[i][j] = elevation;
+    largest -= moves[2];
+    for (int i = moves[0]; i < moves[0]+3 && i < grid.length; i++) {
+      for (int j = moves[1]; j < moves[1]+3 && j < grid[0].length; j++) {
+        if (grid[i][j] > largest) {
+          grid[i][j] = largest;
+        }
       }
     }
   }
 
-  public static int getVolume(){
+  public static void fillGrid(int[][] grid, int row, int col, Scanner s){
+    for (int i = 0; i < row; i++) {
+      for (int j = 0; j < col; j++) {
+        grid[i][j] = s.nextInt();
+      }
+    }
+  }
+
+  public static void generateMoves(int[][] moves, int move, Scanner s){
+    for (int i = 0; i < move; i++) {
+      for (int j = 0; j < 3; j++) {
+        moves[i][j] = s.nextInt();
+        if (j != 2) {
+          moves[i][j] -= 1;
+        }
+      }
+    }
+  }
+
+  public static int calculateVolume(int[][] grid, int row, int col, int depth){
     int volume = 0;
-    for (int i = 0; i < rows; i++){
-      for (int j = 0; j < grid[0].length; j++){
-        volume += grid[i][j] * 5184;
+    for (int i = 0; i < row; i++) {
+      for (int j = 0; j < col; j++) {
+        if (grid[i][j] < depth) {
+          volume += depth - grid[i][j];
+        }
       }
     }
-    return volume;
-  }
-
-  public static void dig(int r, int c, int elevation){
-    int largestVal = grid[r][c];
-    for (int i = 0; i < 10; i++){
-      int newR = r + moves[i][0];
-      int newC = c + moves[i][1];
-      if (grid[newR][newC] > largestVal) largestVal = grid[newR][newC];
-    }
-    int newElevation = largestVal - elevation;
-    for (int j = 0; j < 10; j++){
-      int newR = r + moves[j][0];
-      int newC = c + moves[j][1];
-      if (grid[newR][newC] > newElevation) grid[newR][newC] = newElevation;
-    }
+    return volume * 72 * 72;
   }
 
   public static void main(String[] args){
