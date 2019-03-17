@@ -25,7 +25,7 @@ public class USACO{
     dig(grid, moves[count]);
     count++;
   }
-  
+
   return calculateVolume(grid, row, col, depth);
 }
 
@@ -79,9 +79,89 @@ public class USACO{
     return volume * 72 * 72;
   }
 
+  public static char[][] board;
+public static int silver(String filename){
+
+  String output = "";
+  int[][] moves = {{0,1}, {0,-1}, {1,0}, {-1, 0}};
+  int rows = 0; int cols= 0;
+  int time = 0;
+  int r = 0; int c = 0;
+  int endr = 0; int endc = 0;
+
+  try{
+    File f = new File(filename);
+    Scanner scan = new Scanner(f);
+    rows = scan.nextInt();
+    cols = scan.nextInt();
+    time = scan.nextInt();
+    scan.nextLine();
+
+    String s = "";
+    while(scan.hasNextLine()){
+      s = scan.nextLine();
+      output += s;
+    }
+
+    int index = 0;
+    board = new char[rows][cols];
+    for(int i = 0; i < rows; i++){
+      for(int j = 0; j < cols; j++){
+        board[i][j] = output.charAt(index);
+        index++;
+      }
+    }
+    String[] nums = s.split(" ");
+    r = Integer.parseInt(nums[0]) - 1;
+    c = Integer.parseInt(nums[1]) - 1;
+    endr = Integer.parseInt(nums[2]) - 1;
+    endc = Integer.parseInt(nums[3]) - 1;
+  }
+  catch(FileNotFoundException e){
+
+  }
+
+  int[][] current = new int[rows][cols];
+  int[][] old = new int[rows][cols];
+  for(int i = 0; i < rows; i++){
+    for(int j = 0; j < cols; j++){
+      if(board[i][j] == '*'){
+        current[i][j] = -1;
+      }
+    }
+  }
+  current[r][c] = 1;
+
+  while(time > 0){
+    for(int i = 0; i < rows; i++){
+      for(int j = 0; j < cols; j++){
+        old[i][j] = current[i][j];
+      }
+    }
+
+    for(int i = 0; i < rows; i++){
+      for(int j = 0; j < cols; j++){
+        if(board[i][j] != '*'){
+          current[i][j] = 0;
+          for(int x = 0; x < moves.length; x++){
+            int newR = r + moves[x][0];
+            int newC = c + moves[x][1];
+            if(newR < rows && newC < cols && newR >= 0 && newC >= 0 && old[newR][newC]!= -1){
+              current[i][j] += old[newR][newC];
+            }
+          }
+        }
+      }
+    }
+    time --;
+  }
+  return current[endr][endc];
+}
+
   public static void main(String[] args){
     try{
       System.out.println(bronze("makelake.in"));
+      System.out.println(silver("test.txt"));
     }catch(FileNotFoundException e){
       e.printStackTrace();
     }
