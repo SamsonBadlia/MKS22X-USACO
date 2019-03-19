@@ -80,83 +80,59 @@ public class USACO{
   }
 
   public static char[][] board;
-public static int silver(String filename){
+  public static int silver(String filename) throws FileNotFoundException{
+  	int[][] old; int[][] neW; char[][] data;
 
-  String output = "";
-  int[][] moves = {{0,1}, {0,-1}, {1,0}, {-1, 0}};
-  int rows = 0; int cols= 0;
-  int time = 0;
-  int r = 0; int c = 0;
-  int endr = 0; int endc = 0;
+  	int row; int col;
+    int num;
+    int startR; int startC;
+    int endR; int endC;
 
-  try{
-    File f = new File(filename);
-    Scanner scan = new Scanner(f);
-    rows = scan.nextInt();
-    cols = scan.nextInt();
-    time = scan.nextInt();
-    scan.nextLine();
+    File file = new File(filename);
+    Scanner s = new Scanner(file);
+    row = s.nextInt();
+    col = s.nextInt();
+    num= s.nextInt();
+    board = new char[row][col];
+    neW = new int[row][col];
+    old = new int[row][col];
 
-    String s = "";
-    while(scan.hasNextLine()){
-      s = scan.nextLine();
-      output += s;
-    }
-
-    int index = 0;
-    board = new char[rows][cols];
-    for(int i = 0; i < rows; i++){
-      for(int j = 0; j < cols; j++){
-        board[i][j] = output.charAt(index);
-        index++;
-      }
-    }
-    String[] nums = s.split(" ");
-    r = Integer.parseInt(nums[0]) - 1;
-    c = Integer.parseInt(nums[1]) - 1;
-    endr = Integer.parseInt(nums[2]) - 1;
-    endc = Integer.parseInt(nums[3]) - 1;
-  }
-  catch(FileNotFoundException e){
-
-  }
-
-  int[][] current = new int[rows][cols];
-  int[][] old = new int[rows][cols];
-  for(int i = 0; i < rows; i++){
-    for(int j = 0; j < cols; j++){
-      if(board[i][j] == '*'){
-        current[i][j] = -1;
-      }
-    }
-  }
-  current[r][c] = 1;
-
-  while(time > 0){
-    for(int i = 0; i < rows; i++){
-      for(int j = 0; j < cols; j++){
-        old[i][j] = current[i][j];
-      }
-    }
-
-    for(int i = 0; i < rows; i++){
-      for(int j = 0; j < cols; j++){
-        if(board[i][j] != '*'){
-          current[i][j] = 0;
-          for(int x = 0; x < moves.length; x++){
-            int newR = r + moves[x][0];
-            int newC = c + moves[x][1];
-            if(newR < rows && newC < cols && newR >= 0 && newC >= 0 && old[newR][newC]!= -1){
-              current[i][j] += old[newR][newC];
-            }
+    for (int i = 0; i < row; i++){
+      String str = s.next();
+        for(int j = 0; j < col; j++){
+	          board[i][j] = str.charAt(j);
           }
         }
-      }
+
+    startR = s.nextInt() - 1;
+    startC = s.nextInt() - 1;
+    endR = s.nextInt() - 1;
+    endC = s.nextInt() - 1;
+    old[startR][startC] = 1;
+
+    for(int i = 0; i < num; i++){
+	      for(int x = 0; x < row; x++){
+  		    for(int j = 0; j < col; j++){
+  			       if (board[x][j] != '*'){
+      			    int total = 0;
+      			    if(isOnBoard(x-1,j,row,col)) total = total + old[x-1][j];
+      			    if(isOnBoard(x+1,j,row,col)) total = total + old[x+1][j];
+      			    if(isOnBoard(x,j-1,row,col)) total = total + old[x][j-1];
+      			    if(isOnBoard(x,j+1,row,col)) total = total + old[x][j+1];
+      			    neW[x][j] = total;
+      			     }
+	         }
+	        }
+
+    	old = neW;
+    	neW = new int[row][col];
     }
-    time --;
+    return old[endR][endC];
   }
-  return current[endr][endc];
-}
+
+  private static boolean isOnBoard(int newR,int newC, int r, int c){
+     return newR >= 0 && newC >= 0 && newR < r && newC < c;
+  }
 
   public static void main(String[] args){
     try{
